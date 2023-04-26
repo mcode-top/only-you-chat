@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        /**
+         * @name 二分查找的原理
+         * 取一个数组索引的中间值，来跟查找元素进行比对
+         * -> 大于中间值表示要查找的元素位置在右边，所以左边的一半就要丢掉（left = min + 1）
+         * -> 小于中间值表示要查找的元素位置在左边，所以右边的一半就要丢掉（right = min - 1）
+         * -> 中间值等于元素表示这是查找的位置
+         * 直到 左边的值大于右边的值表示元素不存在
+         */
+        function binarySearch(array, element) {
+            //左边首部
+            let left = 0
+            //右边尾部
+            let right = array.length - 1
+            while (left <= right) {
+                // 取数组的索引中间值
+                const mid = Math.floor((left + right) / 2);
+                console.log(mid)
+                if (element > array[mid]) {
+                    left = mid + 1;
+                } else if (element < array[mid]) {
+                    right = mid - 1;
+                } else {
+                    return mid;
+                }
+            }
+            return -1
+        }
+
+        [1, 2, 5, 6, 87, 98, 332, 554, 1111, 4444].forEach((item, index, array) => {
+            console.log(binarySearch(array, item), index, item)
+        })
+        function midTreeTraverse(tree) {
+            const stack = []
+            let currentTree = tree
+            let i = 0;
+            while (currentTree || stack.length !== 0) {
+                // 遍历左树
+                while (currentTree) {
+                    // 将当前树压入栈中
+                    stack.push(currentTree)
+
+                    currentTree = currentTree.left
+                }
+                // 遍历右树
+                if (stack.length !== 0) {
+                    currentTree = stack.pop()
+                    currentTree = currentTree.right
+                }
+            }
+        }
+        function levelOrderTraverse(tree) {
+            if (!tree) {
+                return;
+            }
+            const queue = [];
+            let currentTree = tree;
+            queue.push(currentTree);
+            while (queue.length !== 0) {
+                // 队列先进先出
+                currentTree = queue.shift();
+                console.log(currentTree.data);
+                if (currentTree.left) queue.push(currentTree.left)
+                if (currentTree.right) queue.push(currentTree.right)
+            }
+        }
+        levelOrderTraverse({
+            data: "A",
+            left: {
+                data: "B",
+                left: {
+                    data: "D"
+                },
+                right: {
+                    data: "F",
+                    left: {
+                        data: "E"
+                    }
+                }
+            },
+            right: {
+                data: "C",
+                left: {
+                    data: "G",
+                    right: {
+                        data: "H"
+                    }
+                },
+                right: {
+                    data: "I"
+                }
+            }
+        })
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            border: none;
+        }
+
+        ul {
+            list-style: none;
+            width: 1200px;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            border: 1px solid #000;
+
+        }
+
+        ul::after {
+            content: '';
+            flex-grow: 999;
+        }
+
+        ul li {
+            margin: 20px;
+            width: 200px;
+            height: 200px;
+            background-color: brown;
+
+        }
+    </style>
+</head>
+
+<body>
+    <input id="input" />
+    <div id="app"></div>
+    <script type="module" src="./main.js"></script>
+    <input type="file" id="file" />
+    <script>
+        var file = document.getElementById("file");
+
+        file.onchange = (evt) => {
+            console.log(evt)
+        }
+    </script>
+    <ul>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+    </ul>
+    <ul>
+        <li></li>
+        <li></li>
+
+    </ul>
+</body>
+<script src="https://unpkg.com/flatted@3.2.7/min.js"></script>
+<script>
+    const uniqMap = new Map();
+    function deepCopy(obj = {}) {
+        if (typeof obj !== "object") return obj;
+        if (obj instanceof Date) return new Date(obj);
+        if (obj instanceof RegExp) return new RegExp(obj);
+        const newObj = new obj.constructor();
+        let currentObj = obj;
+        console.log(uniqMap.has(currentObj))
+        if (uniqMap.has(currentObj)) {
+            return uniqMap.get(currentObj);
+        }
+        // while (currentObj !== undefined) {
+
+        // }
+        uniqMap.set(currentObj, newObj);
+        Object.keys(currentObj).forEach(key => {
+            if (obj.hasOwnProperty(key)) {
+                let value = obj[key];
+                if (typeof value === "object") {
+                    let cacheValue = deepCopy(value)
+                    value = cacheValue
+                }
+                newObj[key] = value;
+            }
+        })
+        return newObj
+    }
+    const obj1 = {
+        a: 1,
+        b: 2,
+        d: [1, 1, 2],
+        date: new Date()
+    }
+    const obj2 = {
+        a: 2,
+        b: 3
+    }
+    obj1.obj2 = obj2;
+    obj2.obj1 = obj1;
+    setTimeout(() => {
+        console.log(deepCopy(obj1).d === obj1.d, obj1.d, deepCopy(obj1).d)
+    }, 1);
+    const getCircularReplacer = () => {
+        const seen = new WeakSet();
+        return (key, value) => {
+            if (typeof value === "object" && value !== null) {
+                if (seen.has(value)) {
+                    return;
+                }
+                seen.add(value);
+            }
+            return value;
+        };
+    }
+
+
+    console.log(Flatted.stringify(obj1), "\n", JSON.stringify(obj1, getCircularReplacer()))
+</script>
+
+<script>
+    // 排序算法
+
+    const testArr = [49, 38, 65, 97, 76, 13, 27, 49]
+    // 冒泡排序法
+    /**
+     * 核心思路每次循环都将最大值向最右边移动，移动到最右边的就不需要参与排序了
+     * 【3，2，1】 -》 第一次循环【 2，1，3 】此时仅需要对【2，1】进行排序即可
+     * */
+    function bubbleSort(arr) {
+        for (let i = 0; i < arr.length; i++) {
+            let done = true;
+            for (let j = 0; j < arr.length - 1 - i; j++) {
+                if (arr[j + 1] < arr[j]) {
+                    [arr[j + 1], arr[j]] = [arr[j], arr[j + 1]]
+                    done = false;
+                }
+            }
+            if(done) break;
+        }
+        return arr;
+    }
+    let i1 = 0;
+    /**
+     * 快速排序
+     * 1. 选择一个中间值，从左和从右开始循环
+     * 2. 当左边的值大于中间值时，将大于值与右边索引位置的值进行交换，同理当右边的值小于中间值时，将小于值与左索引进行交换
+     * 3. 直到左循环与右循环相等，将中间值位置设置为左右循环相等的位置
+     * 
+    */
+    function quickSort(arr, begin, last) {
+        if (begin > last) return;
+        let left = begin;
+        let right = last;
+        const mid = arr[right];
+        while (left < right) {
+            while (left < right && arr[left] <= mid) {
+                left++;
+            }
+            if (left < right) {
+                [arr[right], arr[left]] = [arr[left], arr[right]]
+            }
+            while (left < right && arr[right] >= mid) {
+                right--;
+            }
+            if (left < right) {
+                [arr[right], arr[left]] = [arr[left], arr[right]]
+            }
+        }
+        // 将中间值放到中间位置
+        arr[left] = mid;
+        // 忽略中间值的位置，将左右两边进入排序
+        quickSort(arr, begin, left - 1);
+        quickSort(arr, left + 1, last);
+    }
+
+    let randomArr = Array(1000).fill(1).map(i => Math.floor(Math.random() * 8));
+    let t1 = [...randomArr]
+    let t2 = [...randomArr]
+    console.log(randomArr)
+    console.time("t1")
+    quickSort(t1, 0, t1.length - 1);
+    console.timeEnd("t1")
+    console.log(t1)
+    console.time("t2")
+    bubbleSort(t2);
+    console.timeEnd("t2")
+    console.log(t2)
+
+</script>
+
+</html>

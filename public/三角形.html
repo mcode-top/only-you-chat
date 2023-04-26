@@ -1,0 +1,65 @@
+<!--
+ * @Author: mmmmmmmm
+ * @Date: 2023-04-07 15:34:50
+ * @Description: 文件描述
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        window.a = 1;
+        let b = 2;
+        function deepClone(obj, objMap = new WeakMap()) {
+            if (typeof obj !== "object") {
+                return obj;
+            }
+            if (objMap.has(obj)) {
+                return objMap.get(obj);
+            }
+            const newObj = {}
+            objMap.set(obj, newObj);
+            for (const key in obj) {
+                if (Object.hasOwnProperty.call(obj, key)) {
+                    let element = obj[key];
+                    if (typeof element === "object") {
+                        element = deepClone(element, objMap)
+                    }
+                    newObj[key] = element
+                }
+            }
+            return newObj
+        }
+        let a = {
+            b: 1
+        }
+        let c = {
+            a,
+            c: 1
+        }
+        a.c = c;
+        console.log('====================================');
+        console.log(deepClone(c), c, deepClone(c) === c, deepClone(c).a === c.a);
+        console.log('====================================');
+    </script>
+    <script src="./test.js" type="module"></script>
+    <style>
+        #triangle {
+            width: 0px;
+            height: 0px;
+            border: 20px solid transparent;
+            /* background-color: red; */
+            border-top-color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="triangle"></div>
+</body>
+
+</html>
