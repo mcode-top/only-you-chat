@@ -16,7 +16,7 @@ import { onUnmounted, ref, watch } from 'vue';
 import { freeMedia } from '@/utils';
 import FileToLink from './FileToLink.vue';
 const props = defineProps<{
-  audio?: String | File;
+  audio: String | File | undefined;
   filetype: string;
   filename: string;
   filesize: number;

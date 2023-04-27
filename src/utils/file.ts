@@ -2,7 +2,7 @@ const sizeKB = 1024;
 const sizeMB = 1024 * sizeKB;
 const sizeGB = 1024 * sizeMB;
 /**@name 文件大小转换 */
-export function transformFileSize(size: number) {
+export function transformFileSize(size: number): string | null {
   try {
     if (size >= sizeKB && size <= sizeMB) {
       return (size / sizeKB).toFixed(2) + 'KB';
@@ -22,4 +22,9 @@ export function freeMedia(url: string) {
   if (url !== '' && url.indexOf('blob') === 0) {
     URL.revokeObjectURL(url);
   }
+}
+// 将blob转换为file
+export function blobToFile(blob: Blob, filename: string, type: string) {
+  const file = new File([blob], filename, { type: type });
+  return file;
 }

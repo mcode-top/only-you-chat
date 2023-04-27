@@ -25,9 +25,10 @@
             ><Folder
           /></el-icon>
         </message-upload>
-        <el-icon title="发送语音" class="send-message-header-icon" :size="headerIconSize"
-          ><Microphone
-        /></el-icon>
+        <MessageSendAudio @change="handleSendAudioFile">
+          <el-icon title="发送语音" class="send-message-header-icon" :size="headerIconSize"
+            ><Microphone /></el-icon
+        ></MessageSendAudio>
         <el-icon title="语音通话" class="send-message-header-icon" :size="headerIconSize"
           ><Phone
         /></el-icon>
@@ -85,6 +86,7 @@ import moment from 'moment';
 import EmojiSelect from './EmojiSelect.vue';
 import { ElMessage } from 'element-plus';
 import MessageContent from './MessageContent.vue';
+import MessageSendAudio from './MessageSendAudio.vue';
 const headerIconSize = 18;
 const chatStore = useChatStore();
 const contentRef = ref<HTMLTextAreaElement | null>(null);
@@ -153,9 +155,14 @@ function sendTextMessage() {
   content.editorHtml = '';
 }
 /**@name 发送其他消息 */
-function sendOtherMessage(message: ChatMessageSendContent) {
-  if (message) {
-    messageList.push(message);
+function sendOtherMessage(result: ChatMessageSendContent) {
+  if (result) {
+    if (result.message instanceof File) {
+      result.filename = result.message.name;
+      result.filetype = result.message.type;
+      result.filesize = result.message.size;
+    }
+    messageList.push(result);
   }
 }
 /**@name 绑定按钮事件 */
@@ -166,6 +173,14 @@ function handleControlBtn(message: ChatMessageSendContent) {
 function handleAddEmoji(emoji: string) {
   content.editorHtml += emoji;
   contentRef.value?.focus();
+}
+function handleSendAudioFile(file: File) {
+  sendOtherMessage({
+    isMy: true,
+    message: file,
+    sendMessageType: 'audio',
+    sendAt: moment().format('YYYY-MM-DD HH:mm:ss')
+  });
 }
 </script>
 <style lang="scss" scoped>
