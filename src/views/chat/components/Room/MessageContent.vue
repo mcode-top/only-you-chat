@@ -75,14 +75,14 @@
 </template>
 
 <script setup lang="ts">
-import { useUserStore } from '@/stores/user';
-import type { ChatMessageSendContent } from '@/types/chat';
+import { useUserStore } from '@/stores';
+import type { ChatMessageSendContent } from '@/types';
 import { withDefaults, defineProps, ref, watch, nextTick, reactive } from 'vue';
 import IdToAvatar from '@/components/business/IdToAvatar.vue';
-import FileToImage from '@/components/FileToImage.vue';
-import FileToVideo from '@/components/FileToVideo.vue';
-import FileToAudio from '@/components/FileToAudio.vue';
-import FileToLink from '@/components/FileToLink.vue';
+import FileToImage from '@/components/FileReader/FileToImage.vue';
+import FileToVideo from '@/components/FileReader/FileToVideo.vue';
+import FileToAudio from '@/components/FileReader/FileToAudio.vue';
+import FileToLink from '@/components/FileReader/FileToLink.vue';
 import type { ElImageViewer } from 'element-plus';
 const userStore = useUserStore();
 const reviewrRef = ref<InstanceType<typeof ElImageViewer> | null>(null);

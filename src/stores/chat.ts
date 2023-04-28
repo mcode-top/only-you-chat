@@ -1,4 +1,4 @@
-import type { ChatMessageSendContent, ChatNotificationListItemType } from '@/types/chat';
+import type { ChatMessageSendContent, ChatNotificationListItemType } from '@/types';
 import { ElMessage } from 'element-plus';
 import { defineStore } from 'pinia';
 /**@name 聊天工具栏标签 */

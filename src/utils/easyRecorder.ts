@@ -13,7 +13,7 @@ interface EasyRecorderConfig {
   // 可以听到自己的声音
   ownVoice: boolean;
 }
-export default class EasyRecorder extends EventTarget {
+export class EasyRecorder extends EventTarget {
   audioContext: AudioContext | null = null;
   gainNode: GainNode | null = null;
   analyserNode: AnalyserNode | null = null;

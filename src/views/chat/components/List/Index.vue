@@ -20,7 +20,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { useChatStore } from '@/stores/chat';
+import { useChatStore } from '@/stores';
 import { Search } from '@element-plus/icons-vue';
 import NotificationList from './NotificationList.vue';
 const chatStore = useChatStore();

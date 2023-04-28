@@ -5,9 +5,8 @@
 </template>
 
 <script setup lang="ts">
-import { useChatStore } from '@/stores/chat';
-import { useUserStore } from '@/stores/user';
-import type { ChatNotificationListItemType } from '@/types/chat';
+import { useUserStore, useChatStore } from '@/stores';
+import type { ChatNotificationListItemType } from '@/types';
 import { ref, useAttrs, watch } from 'vue';
 
 const props = defineProps<{

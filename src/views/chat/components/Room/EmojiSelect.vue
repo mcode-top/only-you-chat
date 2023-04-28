@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-import { EmojiList } from '@/utils/emoji';
+import { EmojiList } from '@/utils';
 import { defineEmits } from 'vue';
 // const emit = defineEmits(['change', 'update:visible']);
 const emit = defineEmits<{

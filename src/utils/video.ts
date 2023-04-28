@@ -12,7 +12,7 @@ export async function getVideoFristFarmeImage(url: string, filetype: string): Pr
     videoDOM.muted = true;
     // 允许使用其他域的视频 #https://blog.csdn.net/sai739295732/article/details/78475821
     videoDOM.crossOrigin = 'anonymous';
-    videoDOM.currentTime = 1;
+    videoDOM.currentTime = 0.1;
 
     videoDOM.onloadeddata = function (e) {
       // 视频加载成功后不能马上获取到帧数据

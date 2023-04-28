@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-import type { ChatMessageSendContent, ChatMessageSendType } from '@/types/chat';
+import type { ChatMessageSendContent, ChatMessageSendType } from '@/types';
 import moment from 'moment';
 import { freeMedia, getVideoFristFarmeImage } from '@/utils';
 import { defineEmits, ref, defineExpose } from 'vue';
@@ -62,7 +62,7 @@ function handleOpen(): Promise<ChatMessageSendContent | undefined> {
 async function addVideoMessageContent(defaultContent: ChatMessageSendContent) {
   try {
     if (defaultContent.message instanceof Blob) {
-      const videoURL = URL.createObjectURL(defaultContent.message);
+      const videoURL = URL.createObjectURL(defaultContent.message.slice(0, 77725));
       // 可能会出现白屏原因是浏览器不支持该视频格式 如H265 #https://www.cnblogs.com/cirry/p/14866813.html #https://blog.csdn.net/cgs1999/article/details/108847894
       const videoCover = await getVideoFristFarmeImage(videoURL, defaultContent.filetype!);
       //   freeMedia(videoURL);

@@ -1,4 +1,4 @@
-import type { ChatMessageSendType } from '@/types/chat';
+import type { ChatMessageSendType } from '@/types';
 import moment from 'moment';
 
 /**@name 解析发送消息的类型转换为中文 */

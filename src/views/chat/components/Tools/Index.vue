@@ -21,8 +21,7 @@
 <script setup lang="ts">
 import { ElMessage } from 'element-plus';
 import { reactive, shallowReactive } from 'vue';
-import { useUserStore } from '@/stores/user';
-import { useChatStore } from '@/stores/chat';
+import { useChatStore, useUserStore } from '@/stores';
 import IdToAvatar from '@/components/business/IdToAvatar.vue';
 import { UserFilled, Comment, Setting } from '@element-plus/icons-vue';
 const userStore = useUserStore();

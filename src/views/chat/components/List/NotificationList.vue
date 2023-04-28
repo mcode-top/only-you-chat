@@ -29,9 +29,9 @@
   </div>
 </template>
 <script setup lang="ts">
-import type { ChatNotificationListItem } from '@/types/chat';
+import type { ChatNotificationListItem } from '@/types';
 import { reactive, watch } from 'vue';
-import { useChatStore } from '@/stores/chat';
+import { useChatStore } from '@/stores';
 import { pareseLastMessageDate, parseSendmessageType } from '@/views/chat/helper';
 import IdToAvatar from '@/components/business/IdToAvatar.vue';
 

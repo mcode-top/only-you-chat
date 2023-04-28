@@ -73,9 +73,9 @@
 </template>
 <script setup lang="ts">
 import { onMounted, reactive, ref, shallowRef, watch } from 'vue';
-import type { ChatMessageSendContent } from '@/types/chat';
-import { useChatStore } from '@/stores/chat';
-import type { ChatFriendInfo } from '@/stores/chat';
+import type { ChatMessageSendContent } from '@/types';
+import { useChatStore } from '@/stores';
+import type { ChatFriendInfo } from '@/stores';
 import MessageUpload from './MessageUpload.vue';
 import { MoreFilled, Folder, Microphone, Phone, VideoCamera, Help } from '@element-plus/icons-vue';
 import moment from 'moment';

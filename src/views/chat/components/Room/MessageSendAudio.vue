@@ -75,13 +75,11 @@
 <script setup lang="ts">
 import { computed, defineProps, ref, shallowRef, watch } from 'vue';
 import { ElMessage, ElPopover } from 'element-plus';
-import { useChatStore } from '@/stores/chat';
-import EasyRecorder from '@/utils/easyRecorder';
 import MiddlefrequencyChat from '@/components/business/MiddlefrequencyChat.vue';
-import FileToAudio from '@/components/FileToAudio.vue';
+import FileToAudio from '@/components/FileReader/FileToAudio.vue';
 import { Mic, VideoPause, Check, Close } from '@element-plus/icons-vue';
 import moment from 'moment';
-import { blobToFile } from '@/utils';
+import { blobToFile, EasyRecorder } from '@/utils';
 // 录制状态 recording 录制中 pause 暂停 stop 停止
 type RecordStatus = 'recording' | 'pause' | 'stop';
 const emit = defineEmits<{
