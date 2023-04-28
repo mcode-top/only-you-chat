@@ -2,7 +2,11 @@
 <template>
   <div class="video-box" @click="handleOpenPlay" v-if="support">
     <el-icon :size="60" class="video-play" :color="'#fefefe'"><VideoPlay /></el-icon>
-    <el-avatar class="video-frame" v-bind="attrs" :src="frameSrc"></el-avatar>
+    <el-avatar
+      class="video-frame"
+      v-bind="attrs"
+      :src="props.videoCover || '/logo.png'"
+    ></el-avatar>
   </div>
 
   <file-to-link
@@ -10,81 +14,34 @@
     :filetype="props.filetype"
     :filename="props.filename"
     :filesize="props.filesize"
-    :file="videoSrc"
+    :file="props.video"
   />
 </template>
 <script setup lang="ts">
-import { onUnmounted, ref, useAttrs, watch } from 'vue';
+import { computed, onUnmounted, ref, useAttrs, watch } from 'vue';
 import type { ElAvatar } from 'element-plus';
 import { VideoPlay } from '@element-plus/icons-vue';
-import { freeMedia } from '@/utils';
 import FileToLink from './FileToLink.vue';
+import { openNewBrowserTag } from '@/utils';
 
 const attrs = useAttrs();
 const props = defineProps<{
-  video?: File | String;
+  video?: File | string;
   filetype: string;
   filename: string;
-  filesize: number;
+  // 视频封面
+  videoCover?: string;
+  filesize?: number;
 }>();
-const videoSrc = ref('');
-const frameSrc = ref('');
-const support = ref(true);
+const support = computed(() => {
+  return props.videoCover !== undefined;
+});
 function handleOpenPlay() {
-  openPlay(videoSrc.value);
-}
-function openPlay(url: string) {
-  window.open(url);
-}
-/**@name 获取视频的帧 */
-function getVideoFrame(video: string) {
-  const canvasDOM = document.createElement('canvas');
-
-  const ctx = canvasDOM.getContext('2d');
-  const videoDOM = document.createElement('video');
-  if (videoDOM.canPlayType(props.filetype) !== 'maybe') {
-    support.value = false;
-    return;
+  if (props.video) {
+    openNewBrowserTag(props.video);
   }
-  support.value = true;
-  videoDOM.src = video;
-  videoDOM.muted = true;
-  videoDOM.onloadeddata = async function (e) {
-    // 视频加载成功后不能马上获取到帧数据
-    // 参考文章 https://juejin.cn/post/6844903933631004679
-    await videoDOM.play();
-    setTimeout(() => {
-      canvasDOM.width = videoDOM.videoWidth;
-      canvasDOM.height = videoDOM.videoHeight;
-      ctx?.drawImage(videoDOM, 0, 0, videoDOM.videoWidth, videoDOM.videoHeight);
-      frameSrc.value = canvasDOM.toDataURL('image/jpeg');
-    }, 100);
-  };
 }
-watch(
-  () => props.video,
-  (newValue) => {
-    if (newValue instanceof File) {
-      videoSrc.value = URL.createObjectURL(newValue);
-      getVideoFrame(videoSrc.value);
-    } else if (typeof newValue === 'string') {
-      getVideoFrame(newValue);
-    } else {
-      videoSrc.value = '';
-      frameSrc.value = '';
-    }
-  },
-  {
-    immediate: true
-  }
-);
-
-onUnmounted(() => {
-  freeMedia(frameSrc.value);
-});
-watch(frameSrc, (newValue, oldValue) => {
-  freeMedia(oldValue);
-});
+openNewBrowserTag;
 </script>
 <style lang="scss">
 .video-box {

@@ -39,6 +39,7 @@
               :filesize="item.filesize!"
               :video="item.message"
               :filename="item.filename!"
+              :video-cover="item.videoCover"
             ></file-to-video>
           </div>
           <div v-else-if="item.sendMessageType === 'audio'">
@@ -118,19 +119,17 @@ function handleImageClick(index: number) {
   reviewrVisible.value = true;
   // 图片维护的数组与消息数组的索引不一致索引要对齐搜索
   const findIndex = imageList.value.findIndex((i) => i.index === index);
-  console.log('====================================');
-  console.log(findIndex);
-  console.log('====================================');
   nextTick(() => {
     reviewrRef.value?.setActiveItem(findIndex);
   });
 }
 watch(
-  props.list,
-  () => {
+  () => props.list,
+  (n, o) => {
     nextTick(() => {
       if (chatContentRef.value) {
-        if (props.list.length && props.list[props.list.length - 1].isMy) {
+        if (props.list.length && (props.list[props.list.length - 1].isMy || o!.length <= 2)) {
+          // o.length<=2 用于判断是否是第一次加载
           chatContentRef.value.scrollTo(0, chatContentRef.value.scrollHeight);
         }
       }

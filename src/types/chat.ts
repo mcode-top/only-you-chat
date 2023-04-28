@@ -30,4 +30,6 @@ export type ChatMessageSendContent = {
   filesize?: number;
   // 发送的文件存储方式
   storageMode?: 'alioss' | 'onedrive' | 'googledrive' | 'server';
+  // sendMessageType = 'video'时的封面
+  videoCover?: string;
 };

@@ -17,14 +17,14 @@ export function transformFileSize(size: number): string | null {
     return null;
   }
 }
-// 释放媒体资源
+/**@name 释放媒体资源 */
 export function freeMedia(url: string) {
   if (url !== '' && url.indexOf('blob') === 0) {
     URL.revokeObjectURL(url);
   }
 }
-// 将blob转换为file
-export function blobToFile(blob: Blob, filename: string, type: string) {
-  const file = new File([blob], filename, { type: type });
+/**@name 将blob转换为file */
+export function blobToFile(blob: Blob, filename: string, type?: string) {
+  const file = new File([blob], filename, { type: type || blob.type });
   return file;
 }

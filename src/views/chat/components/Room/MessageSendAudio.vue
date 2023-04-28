@@ -220,7 +220,7 @@ function handleRecordedCompleted(err: Event | undefined, blob: Blob | undefined)
     throw new Error(err.toString());
   }
   if (blob) {
-    audioFile.value = blobToFile(blob, `${moment().format('YYMMDDHHmmsss')}.webm`, 'audio/webm');
+    audioFile.value = blobToFile(blob, `${moment().format('YYMMDDHHmmsss')}.webm`);
   }
   currentMediaRecord = null;
 }
@@ -232,7 +232,7 @@ watch(visible, (newValue) => {
   } else {
     audioFile.value = undefined;
     recorderTime.value = 0;
-    stopTime();
+    status.value = 'stop';
     audioFile.value = undefined;
     frequencyData.value = undefined;
     currentMediaRecord = null;
@@ -244,9 +244,6 @@ watch(status, (newValue, oldValue) => {
   if (newValue === 'recording') {
     startTime(oldValue === 'stop');
   } else if (newValue === 'stop') {
-    console.log('====================================');
-    console.log(newValue);
-    console.log('====================================');
     stopTime();
   }
 });

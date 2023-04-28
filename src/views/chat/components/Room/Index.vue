@@ -67,11 +67,7 @@
         </el-dropdown>
       </div>
       <!-- emoji表情栏 -->
-      <emoji-select
-        ref="avcref"
-        v-model:visible="content.showEmoji"
-        @change="handleAddEmoji"
-      ></emoji-select>
+      <emoji-select v-model:visible="content.showEmoji" @change="handleAddEmoji"></emoji-select>
     </div>
   </div>
 </template>
@@ -96,41 +92,28 @@ const content = reactive({
   friendInfo: undefined as undefined | ChatFriendInfo,
   focus: false
 });
-const avcref = ref();
-onMounted(() => {
-  console.log('====================================');
-  console.log(avcref);
-  console.log('====================================');
-});
 watch(
   () => chatStore.$state.room,
   (room) => {
+    // 如果房间被切换，那么就获取房间的信息
     if (room) {
       if (room.type === 'personal') {
+        // 如果是私聊，那么就获取好友的信息
         chatStore.getFriendsInfo(room.id!).then((res) => {
           content.friendInfo = res;
+        });
+        // 获取聊天记录
+        chatStore.getMessageRecord(room).then((res) => {
+          if (res) {
+            messageList.value = res;
+          }
         });
       }
     }
   },
   { immediate: true }
 );
-const messageList = reactive<ChatMessageSendContent[]>([
-  {
-    isMy: true,
-    id: 0,
-    message: `在这个例子中，我们使用了ID选择器#my-element来选择ID为my-element的元素，并使用伪类选择器::-webkit-scrollbar来为它的滚动条设置样式。然后，我们定义了滚动条的宽度、背景颜色和滑块的颜色和形状。最后，我们使用伪类选择器::-webkit-scrollbar-thumb:hover来定义鼠标悬停在滑块上时的样式。`,
-    sendMessageType: 'text',
-    sendAt: '2023-04-24 13:12'
-  },
-  {
-    isMy: false,
-    id: 1,
-    message: `在这个例子中，我们使用了ID选择器#my-element来选择ID为my-element的元素，并使用伪类选择器::-webkit-scrollbar来为它的滚动条设置样式。然后，我们定义了滚动条的宽度、背景颜色和滑块的颜色和形状。最后，我们使用伪类选择器::-webkit-scrollbar-thumb:hover来定义鼠标悬停在滑块上时的样式。`,
-    sendMessageType: 'text',
-    sendAt: '2023-04-24 13:12'
-  }
-]);
+const messageList = shallowRef<ChatMessageSendContent[]>([]);
 
 /**@name 输入框键盘按下 */
 function handleTextareaKeyUp(e: KeyboardEvent) {
@@ -146,12 +129,13 @@ function sendTextMessage() {
     ElMessage({ message: '无法发送空数据', type: 'warning', duration: 2000 });
     return;
   }
-  messageList.push({
+  const result = {
     isMy: true,
     message: content.editorHtml,
     sendMessageType: 'text',
     sendAt: moment().format('YYYY-MM-DD HH:mm:ss')
-  });
+  } as ChatMessageSendContent;
+  messageList.value = [...messageList.value, result];
   content.editorHtml = '';
 }
 /**@name 发送其他消息 */
@@ -162,7 +146,7 @@ function sendOtherMessage(result: ChatMessageSendContent) {
       result.filetype = result.message.type;
       result.filesize = result.message.size;
     }
-    messageList.push(result);
+    messageList.value = [...messageList.value, result];
   }
 }
 /**@name 绑定按钮事件 */

@@ -10,6 +10,7 @@
 <script setup lang="ts">
 import type { ChatMessageSendContent, ChatMessageSendType } from '@/types/chat';
 import moment from 'moment';
+import { freeMedia, getVideoFristFarmeImage } from '@/utils';
 import { defineEmits, ref, defineExpose } from 'vue';
 // const emit = defineEmits(['change', 'update:visible']);
 
@@ -21,10 +22,11 @@ const fileRef = ref<HTMLInputElement | null>(null);
 function handleOpen(): Promise<ChatMessageSendContent | undefined> {
   return new Promise((resolve, reject) => {
     if (fileRef.value) {
-      fileRef.value.onchange = () => {
+      fileRef.value.onchange = async () => {
         if (fileRef.value?.files?.length) {
           const currentFile = fileRef.value?.files[0];
-          const message = {
+
+          let message = {
             isMy: true,
             message: currentFile,
             sendMessageType: parseAccept(currentFile.type),
@@ -33,6 +35,14 @@ function handleOpen(): Promise<ChatMessageSendContent | undefined> {
             filetype: currentFile.type,
             filename: currentFile.name
           } as ChatMessageSendContent;
+          switch (message.sendMessageType) {
+            case 'video':
+              message = await addVideoMessageContent(message);
+              break;
+
+            default:
+              break;
+          }
           // 每次上传完成都重置下value,用于解决文件不能重复上传的问题
           fileRef.value!.value = '';
           emit('change', message);
@@ -47,6 +57,24 @@ function handleOpen(): Promise<ChatMessageSendContent | undefined> {
       fileRef.value.click();
     }
   });
+}
+/**@name 追加视频消息内容 */
+async function addVideoMessageContent(defaultContent: ChatMessageSendContent) {
+  try {
+    if (defaultContent.message instanceof Blob) {
+      const videoURL = URL.createObjectURL(defaultContent.message);
+      // 可能会出现白屏原因是浏览器不支持该视频格式 如H265 #https://www.cnblogs.com/cirry/p/14866813.html #https://blog.csdn.net/cgs1999/article/details/108847894
+      const videoCover = await getVideoFristFarmeImage(videoURL, defaultContent.filetype!);
+      //   freeMedia(videoURL);
+      return {
+        ...defaultContent,
+        videoCover
+      };
+    }
+  } catch (error) {
+    console.error('获取视频封面失败', error);
+  }
+  return defaultContent;
 }
 /**@name 解析上传文件的类型 */
 function parseAccept(type: string): ChatMessageSendType {

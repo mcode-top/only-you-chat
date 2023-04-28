@@ -1,6 +1,10 @@
 <!-- 文件类型转换下载链接 -->
 <template>
-  <a :href="src" class="file-link" :title="`${props.filename}\n${props.filetype}\n${zhSize}`">
+  <a
+    class="file-link"
+    @click.stop="handleOpen"
+    :title="`${props.filename}\n${props.filetype}\n${zhSize}`"
+  >
     <div class="file-link-icon">
       <el-icon :size="60"><Document /></el-icon>
     </div>
@@ -14,36 +18,21 @@
 <script setup lang="ts">
 import { computed, onUnmounted, ref, useAttrs, watch } from 'vue';
 import { Document } from '@element-plus/icons-vue';
-import { freeMedia, transformFileSize } from '@/utils';
+import { freeMedia, openNewBrowserTag, transformFileSize } from '@/utils';
 const props = defineProps<{
-  file?: File | String;
+  file?: File | string;
   filetype: string;
   filename: string;
-  filesize: number;
+  filesize?: number;
 }>();
-const src = ref('');
-const zhSize = computed(() => transformFileSize(props.filesize));
-watch(
-  () => props.file,
-  (newValue) => {
-    if (newValue instanceof File) {
-      src.value = URL.createObjectURL(newValue);
-    } else if (typeof newValue === 'string') {
-      src.value = newValue;
-    } else {
-      src.value = '';
-    }
-  },
-  {
-    immediate: true
+const zhSize = computed(() => (props.filesize ? transformFileSize(props.filesize) : '未知'));
+
+function handleOpen() {
+  if (props.file) {
+    let src = openNewBrowserTag(props.file);
+    freeMedia(src);
   }
-);
-onUnmounted(() => {
-  freeMedia(src.value);
-});
-watch(src, (newValue, oldValue) => {
-  freeMedia(oldValue);
-});
+}
 </script>
 <style lang="scss">
 .file-link {

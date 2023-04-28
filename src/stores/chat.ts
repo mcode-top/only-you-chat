@@ -1,4 +1,4 @@
-import type { ChatNotificationListItemType } from '@/types/chat';
+import type { ChatMessageSendContent, ChatNotificationListItemType } from '@/types/chat';
 import { ElMessage } from 'element-plus';
 import { defineStore } from 'pinia';
 /**@name 聊天工具栏标签 */
@@ -6,7 +6,7 @@ export type ChatToolsType = 'chat' | 'contact';
 /**@name 聊天房间内容 */
 export type ChatMessageRoomContent = {
   type: ChatNotificationListItemType;
-  id?: number;
+  id: number;
 };
 /**@name 聊天朋友信息 */
 export type ChatFriendInfo = {
@@ -26,34 +26,46 @@ export type ChatGroupInfo = {
   id: number;
   avatar: string;
 };
+// 好友信息缓存
+const friendsInfoCache: Map<number, ChatFriendInfo> = new Map();
+// 群组人员信息缓存
+const groupInfoCache: Map<number, ChatGroupInfo> = new Map();
 export const useChatStore = defineStore({
   id: 'chat',
   state: () => {
     return {
       currentType: 'chat' as ChatToolsType,
       globalSearch: '',
-      room: undefined as undefined | ChatMessageRoomContent,
-      friendsInfoCache: new Map<number, ChatFriendInfo>(),
-      groupInfoCache: new Map<number, ChatGroupInfo>()
+      room: undefined as undefined | ChatMessageRoomContent
     };
   },
   actions: {
+    /**@name 获取好友信息 */
     async getFriendsInfo(id: number) {
-      if (this.friendsInfoCache.has(id)) {
-        return this.friendsInfoCache.get(id);
+      if (friendsInfoCache.has(id)) {
+        return friendsInfoCache.get(id);
       } else {
         return getUser(id).then((res) => {
-          this.friendsInfoCache.set(id, res);
+          friendsInfoCache.set(id, res);
           return res;
         });
+      }
+    },
+    // 获取消息记录
+    async getMessageRecord(room?: ChatMessageRoomContent) {
+      if (room) {
+        if (room?.type === 'personal') {
+          // 如果是私聊
+          return getPersonalMessageRecord(room.id);
+        }
       }
     },
     /**@name 设置当前工具栏显示内容 */
     setCurrentType(type: ChatToolsType) {
       this.currentType = type;
     },
-    /**@name 设置消息房间 */
-    setMessageRoom(room?: ChatMessageRoomContent) {
+    /**@name 切换消息房间 */
+    switchMessageRoom(room?: ChatMessageRoomContent) {
       this.room = room;
     },
     /**@name 全局搜索 */
@@ -94,4 +106,52 @@ async function getUser(id: number) {
         'data:image/png;base64,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'
     };
   }
+}
+// 获取私聊消息记录
+async function getPersonalMessageRecord(
+  friendId: number,
+  pageSize: number = 0
+): Promise<ChatMessageSendContent[]> {
+  if (friendId === 1) {
+    return [
+      {
+        isMy: true,
+        id: 0,
+        message: `你好小金`,
+        sendMessageType: 'text',
+        sendAt: '2023-04-24 13:12'
+      },
+      {
+        isMy: false,
+        id: 1,
+        message: `你好开发者`,
+        sendMessageType: 'text',
+        sendAt: '2023-04-24 13:12'
+      },
+      {
+        isMy: false,
+        id: 1,
+        message: `这只是一个模拟消息`,
+        sendMessageType: 'text',
+        sendAt: '2023-04-24 14:12'
+      },
+      {
+        isMy: false,
+        id: 1,
+        message: `https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbr4k31GGsP37V7XNWbTU8SKCI3TDtQY6YQg&usqp=CAU`,
+        sendMessageType: 'image',
+        sendAt: '2023-04-24 14:12'
+      },
+      {
+        isMy: false,
+        id: 1,
+        message: `https://cdn.coverr.co/videos/coverr-women-holding-hands-outdoors-3878/1080p.mp4`,
+        sendMessageType: 'video',
+        filename: 'outdoors-3878',
+        filetype: 'video/mp4',
+        sendAt: '2023-04-24 14:12'
+      }
+    ];
+  }
+  return [];
 }

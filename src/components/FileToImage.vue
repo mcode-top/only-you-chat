@@ -7,7 +7,7 @@ import { ref, useAttrs, watch } from 'vue';
 import type { ElAvatar } from 'element-plus';
 const attrs = useAttrs();
 const props = defineProps<{
-  image?: File | String;
+  image?: File | string;
 }>();
 
 const src = ref('');

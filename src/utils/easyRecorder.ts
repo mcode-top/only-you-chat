@@ -1,5 +1,8 @@
 // 简单的封装一下浏览器录音功能 参考文章 https://developer.mozilla.org/zh-CN/docs/Web/API/Web_Audio_API#audio_workers
 
+import { getWaveBlob } from 'webm-to-wav-converter';
+import fixWebmDuration from 'fix-webm-duration';
+
 interface EasyRecorderConfig {
   // 采集缓冲区大小 默认4096
   collectBufferSize: number;
@@ -10,7 +13,6 @@ interface EasyRecorderConfig {
   // 可以听到自己的声音
   ownVoice: boolean;
 }
-// 报错怎么处理
 export default class EasyRecorder extends EventTarget {
   audioContext: AudioContext | null = null;
   gainNode: GainNode | null = null;
@@ -49,7 +51,7 @@ export default class EasyRecorder extends EventTarget {
         const scriptNode = audioContext.createScriptProcessor(this.config.collectBufferSize, 1, 1);
         // 提取频谱信息
         const analyserNode = audioContext.createAnalyser();
-        // fftSize 为采样点的数量,默认为2048,范围为32-32768,且必须是2的幂次方
+        // fftSize 为获取图信息的采样点的数量,默认为256,范围为32-32768,且必须是2的幂次方
         analyserNode.fftSize = this.config.fftSize;
         // 创建一个播放源节点
         const destinationNode = audioContext.createMediaStreamDestination();
@@ -141,12 +143,14 @@ export default class EasyRecorder extends EventTarget {
 
   /**@name 开始录制声音 */
   startRecord(
-    cb: (err: undefined | Event, blob?: Blob) => void,
+    cb: (err?: any, blob?: Blob) => void,
     destinationNode: MediaStreamAudioDestinationNode = this.destinationNode!
   ) {
     // 此时增益节点中已经有了录音轨道和播放轨道,他们都在播放源中
     const mixedStream = destinationNode.stream;
-
+    // 记录录制声音时长
+    let duration = 0;
+    let pauseDuration = 0;
     let mediaRecorder: MediaRecorder | null = new MediaRecorder(mixedStream, {
       mimeType: 'audio/webm; codecs=opus'
     });
@@ -155,10 +159,35 @@ export default class EasyRecorder extends EventTarget {
     mediaRecorder.ondataavailable = (e) => {
       tempChunks.push(e.data);
     };
-    mediaRecorder.onstop = () => {
+    mediaRecorder.onstart = () => {
+      duration = Date.now();
+    };
+    mediaRecorder.onpause = () => {
+      if (pauseDuration === 0) {
+        pauseDuration = Date.now();
+      }
+    };
+    mediaRecorder.onresume = () => {
+      duration += Date.now() - pauseDuration;
+      pauseDuration = 0;
+    };
+    mediaRecorder.onstop = async () => {
       // 将录制完成的数据保存为webm文件
-      const blob = new Blob(tempChunks, { type: 'audio/webm; codecs=opus' });
-      cb(undefined, blob);
+      const blob = new Blob([...tempChunks], { type: 'audio/webm; codecs=opus' });
+      try {
+        // 修复webm录制没有时长的问题  参考 #https://www.bugs.cc/p/webm-progress-bar-problem-and-solution/ #https://github.com/yusitnikov/fix-webm-duration
+        fixWebmDuration(blob, Date.now() - duration, { logger: false }).then(function (fixedBlob) {
+          cb(undefined, fixedBlob);
+          console.log('====================================');
+          console.log(URL.createObjectURL(blob));
+          console.log('====================================');
+        });
+      } catch (error) {
+        console.error(error);
+
+        cb(error);
+      }
+
       mediaRecorder = null;
     };
     mediaRecorder.onerror = (e) => {

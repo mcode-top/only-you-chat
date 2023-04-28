@@ -5,7 +5,7 @@
       :class="activeRoom(item) ? 'chat-item-active' : ''"
       v-for="item in notificationList"
       :key="item.type + item.id"
-      @click="chatStore.setMessageRoom(item)"
+      @click="chatStore.switchMessageRoom(item)"
     >
       <div class="chat-avatar">
         <el-badge :is-dot="item.unreadCount > 0" type="danger">
@@ -30,7 +30,7 @@
 </template>
 <script setup lang="ts">
 import type { ChatNotificationListItem } from '@/types/chat';
-import { reactive } from 'vue';
+import { reactive, watch } from 'vue';
 import { useChatStore } from '@/stores/chat';
 import { pareseLastMessageDate, parseSendmessageType } from '@/views/chat/helper';
 import IdToAvatar from '@/components/business/IdToAvatar.vue';
@@ -68,6 +68,15 @@ const notificationList = reactive<ChatNotificationListItem[]>([
     unreadCount: 1
   }
 ]);
+watch(
+  () => notificationList,
+  (newValue) => {
+    if (newValue.length > 0 && !chatStore.$state.room) {
+      chatStore.switchMessageRoom(newValue[0]);
+    }
+  },
+  { immediate: true }
+);
 
 function activeRoom(item: ChatNotificationListItem) {
   if (chatStore.$state.room) {
