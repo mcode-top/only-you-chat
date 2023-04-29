@@ -7,79 +7,79 @@
 
 function reactive(obj) {
   if (typeof obj !== 'object') {
-    return obj
+    return obj;
   }
 
   return new Proxy(obj, {
     get(target, property, receiver) {
-      track(receiver, property)
-      const result = Reflect.get(target, property, receiver)
+      track(receiver, property);
+      const result = Reflect.get(target, property, receiver);
       if (typeof result === 'object') {
         // 检查值是否为对象,是的话也加入响应式
-        return reactive(result)
+        return reactive(result);
       }
-      return result
+      return result;
     },
     set(target, property, value, receiver) {
-      const oldValue = Reflect.get(target, property, receiver)
-      Reflect.set(target, property, value, receiver)
-      trigger(receiver, property, value, oldValue)
+      const oldValue = Reflect.get(target, property, receiver);
+      Reflect.set(target, property, value, receiver);
+      trigger(receiver, property, value, oldValue);
     }
-  })
+  });
 }
 
-let globalCacheFn = null
+let globalCacheFn = null;
 
 /**@name 设置监听函数 */
 function effect(fn) {
   if (typeof fn !== 'function') {
-    return
+    return;
   }
-  globalCacheFn = fn
-  fn()
-  globalCacheFn = null
-  return fn
+  globalCacheFn = fn;
+  fn();
+  globalCacheFn = null;
+  return fn;
 }
 
-const targetMap = new WeakMap()
+const targetMap = new WeakMap();
 // 添加依赖
 function track(self, key) {
   if (!globalCacheFn) {
-    return
+    return;
   }
-  let depMap = targetMap.get(self)
+  let depMap = targetMap.get(self);
   if (!depMap) {
-    depMap = new Map()
-    targetMap.set(self, depMap)
+    depMap = new Map();
+    targetMap.set(self, depMap);
   }
-  let depObjToKeySet = depMap.get(key)
+  let depObjToKeySet = depMap.get(key);
   if (!depObjToKeySet) {
-    depObjToKeySet = new Set()
-    depMap.set(key, depObjToKeySet)
+    depObjToKeySet = new Set();
+    depMap.set(key, depObjToKeySet);
   }
-  depObjToKeySet.add(globalCacheFn)
+  depObjToKeySet.add(globalCacheFn);
 }
 
 function trigger(self, key, newValue, oldValue) {
-  let depMap = targetMap.get(self)
+  let depMap = targetMap.get(self);
   if (!depMap) {
-    return
+    return;
   }
-  let depObjToKeySet = depMap.get(key)
+  let depObjToKeySet = depMap.get(key);
   if (!depObjToKeySet) {
-    return
+    return;
   }
   depObjToKeySet.forEach((item) => {
-    item(newValue, oldValue)
-  })
+    item(newValue, oldValue);
+  });
 }
 const obj = reactive({
   a: 1,
   b: 2
-})
+});
 effect(() => {
-  console.log(obj)
-})
-obj.a = 2
-obj.a = 3
-obj.a = 4
+  console.log(obj);
+});
+obj.a = 2;
+obj.a = 3;
+obj.a = 4;

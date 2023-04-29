@@ -6,66 +6,66 @@
  */
 function reactive(obj) {
   if (typeof obj !== 'object') {
-    return obj
+    return obj;
   }
   return new Proxy(obj, {
     get(target, property, self) {
-      track(self, property)
-      const result = Reflect.get(target, property, self)
+      track(self, property);
+      const result = Reflect.get(target, property, self);
       if (typeof result === 'object') {
         // 检查是对象，如果是对象也给其添加响应式
-        return reactive(result)
+        return reactive(result);
       }
-      return result
+      return result;
     },
     set(target, property, value, self) {
-      Reflect.set(target, property, value, self)
-      trigger(self, property)
+      Reflect.set(target, property, value, self);
+      trigger(self, property);
     }
-  })
+  });
 }
-let globalCacheFn = null
+let globalCacheFn = null;
 function effect(fn) {
-  globalCacheFn = fn
-  fn()
-  globalCacheFn = null
+  globalCacheFn = fn;
+  fn();
+  globalCacheFn = null;
 }
-const targetMap = new WeakMap()
+const targetMap = new WeakMap();
 function track(self, property) {
   if (!globalCacheFn) {
-    return
+    return;
   }
-  let depMap = targetMap.get(self)
+  let depMap = targetMap.get(self);
   if (!depMap) {
-    targetMap.set(self, (depMap = new Map()))
+    targetMap.set(self, (depMap = new Map()));
   }
-  let effectFnSet = depMap.get(property)
+  let effectFnSet = depMap.get(property);
   if (!effectFnSet) {
-    depMap.set(property, (effectFnSet = new Set()))
+    depMap.set(property, (effectFnSet = new Set()));
   }
   // 绑定监听
-  effectFnSet.add(globalCacheFn)
+  effectFnSet.add(globalCacheFn);
 }
 function trigger(self, property) {
-  let depMap = targetMap.get(self)
+  let depMap = targetMap.get(self);
   if (!depMap) {
-    return
+    return;
   }
-  let effectFnSet = depMap.get(property)
+  let effectFnSet = depMap.get(property);
   if (!effectFnSet) {
-    return
+    return;
   }
   effectFnSet.forEach((eff) => {
-    eff()
-  })
+    eff();
+  });
 }
 const obj = reactive({
   a: 1,
   b: 2
-})
+});
 effect(() => {
-  console.log(obj.a)
-})
-obj.a = 2
-obj.a = 3
-obj.a = 4
+  console.log(obj.a);
+});
+obj.a = 2;
+obj.a = 3;
+obj.a = 4;

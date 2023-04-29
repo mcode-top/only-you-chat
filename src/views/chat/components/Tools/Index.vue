@@ -33,7 +33,6 @@ const tools = [
     title: '聊天',
     type: 'chat',
     click: () => {
-      ElMessage('聊天框');
       chatStore.setCurrentType('chat');
     }
   },
@@ -42,7 +41,6 @@ const tools = [
     title: '联系人',
     type: 'contact',
     click: () => {
-      ElMessage('联系人');
       chatStore.setCurrentType('contact');
     }
   }

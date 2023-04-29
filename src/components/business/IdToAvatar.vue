@@ -6,11 +6,11 @@
 
 <script setup lang="ts">
 import { useUserStore, useChatStore } from '@/stores';
-import type { ChatNotificationListItemType } from '@/types';
+import type { ChatNotificationListItemType, ObjectId } from '@/types';
 import { ref, useAttrs, watch } from 'vue';
 
 const props = defineProps<{
-  id: number;
+  id: ObjectId;
   type?: ChatNotificationListItemType;
 }>();
 const attrs = useAttrs();

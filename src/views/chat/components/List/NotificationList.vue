@@ -1,5 +1,5 @@
 <template>
-  <div class="chat-list">
+  <div class="chat-list default-scrollbar">
     <div
       class="chat-item"
       :class="activeRoom(item) ? 'chat-item-active' : ''"
@@ -44,7 +44,7 @@ const notificationList = reactive<ChatNotificationListItem[]>([
     avatar: '/logo.png',
     type: 'personal',
     sendType: 'text',
-    id: 1,
+    id: '1',
     unreadCount: 1
   },
   {
@@ -54,7 +54,7 @@ const notificationList = reactive<ChatNotificationListItem[]>([
     avatar: '/logo.png',
     type: 'personal',
     sendType: 'image',
-    id: 2,
+    id: '2',
     unreadCount: 2
   },
   {
@@ -64,14 +64,14 @@ const notificationList = reactive<ChatNotificationListItem[]>([
     avatar: '/logo.png',
     type: 'personal',
     sendType: 'text',
-    id: 3,
+    id: '3',
     unreadCount: 1
   }
 ]);
 watch(
   () => notificationList,
   (newValue) => {
-    if (newValue.length > 0 && !chatStore.$state.room) {
+    if (newValue.length > 0 && !chatStore.$state.currentRoom) {
       chatStore.switchMessageRoom(newValue[0]);
     }
   },
@@ -79,8 +79,11 @@ watch(
 );
 
 function activeRoom(item: ChatNotificationListItem) {
-  if (chatStore.$state.room) {
-    return item.type + item.id === chatStore.$state.room.type + chatStore.$state.room.id;
+  if (chatStore.$state.currentRoom) {
+    return (
+      item.type + item.id ===
+      chatStore.$state?.currentRoom?.type + chatStore.$state?.currentRoom?.id
+    );
   } else {
     return false;
   }
@@ -90,13 +93,14 @@ function activeRoom(item: ChatNotificationListItem) {
 .chat-list {
   width: 100%;
   height: 100%;
+  overflow-y: auto;
   .chat-item-active {
     background-color: #ccc !important;
   }
   .chat-item {
     cursor: pointer;
     user-select: none;
-    height: 50px;
+    min-height: 50px;
     padding: 10px 0 10px 10px;
     width: 100%;
     display: flex;
@@ -110,8 +114,9 @@ function activeRoom(item: ChatNotificationListItem) {
     }
     .chat-info {
       font-size: 14px;
-      width: 135px;
+      flex-grow: 1;
       padding: 0 10px;
+      min-width: 0;
       .chat-title {
         white-space: nowrap;
         width: 100%;
@@ -121,9 +126,10 @@ function activeRoom(item: ChatNotificationListItem) {
       .chat-message {
         margin-top: 5px;
         font-size: 12px;
+
         color: rgba($color: #000000, $alpha: 0.5);
         white-space: nowrap;
-        width: 100%;
+        clear: both;
         text-overflow: ellipsis;
         overflow: hidden;
       }

@@ -1,15 +1,15 @@
-import { h } from './js/render/h.js'
-import { throttle, debounce } from './utils/index.js'
+import { h } from './js/render/h.js';
+import { throttle, debounce } from './utils/index.js';
 const node = h(
   'a',
   { props: { herf: 'baidu.com' } },
   h('span', { props: { herf: 'baidu.com' } }, '链接')
-)
+);
 document.getElementById('input').oninput = debounce((ev) => {
-  const value = ev.target.value
-  console.log(value)
-}, 200)
-console.log(node)
+  const value = ev.target.value;
+  console.log(value);
+}, 200);
+console.log(node);
 /**
  * @name 二分查找的原理
  * 取一个数组索引的中间值，来跟查找元素进行比对
@@ -20,19 +20,19 @@ console.log(node)
  */
 function binarySearch(array, element) {
   //左边首部
-  let left = 0
+  let left = 0;
   //右边尾部
-  let right = array.length - 1
+  let right = array.length - 1;
   while (left >= right) {
     // 取数组的索引中间值
-    const mid = Math.floor((left + right) / 2)
+    const mid = Math.floor((left + right) / 2);
     if (element > array[mid]) {
-      left = mid + 1
+      left = mid + 1;
     } else if (element < array[mid]) {
-      right = mid - 1
+      right = mid - 1;
     } else {
-      return mid
+      return mid;
     }
   }
-  return -1
+  return -1;
 }

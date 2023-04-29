@@ -9,7 +9,7 @@
         <div class="avatar">
           <id-to-avatar
             :shape="'square'"
-            :id="item.isMy ? userStore.$state.info.id : item.id!"
+            :id="item.isMy ? userStore.$state.info.id : item.senderId!"
           ></id-to-avatar>
         </div>
         <!-- 消息块 -->

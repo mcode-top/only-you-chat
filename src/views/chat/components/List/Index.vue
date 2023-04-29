@@ -15,7 +15,8 @@
     </div>
     <!-- 内容栏 -->
     <div class="chat-contact-content">
-      <notification-list />
+      <notification-list v-if="chatStore.$state.currentType === 'chat'" />
+      <contact-list v-else-if="chatStore.$state.currentType === 'contact'" />
     </div>
   </div>
 </template>
@@ -23,6 +24,7 @@
 import { useChatStore } from '@/stores';
 import { Search } from '@element-plus/icons-vue';
 import NotificationList from './NotificationList.vue';
+import ContactList from './ContactList.vue';
 const chatStore = useChatStore();
 </script>
 <style lang="scss" scoped>

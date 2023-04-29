@@ -75,7 +75,7 @@
 <script setup lang="ts">
 import { computed, defineProps, ref, shallowRef, watch } from 'vue';
 import { ElMessage, ElPopover } from 'element-plus';
-import MiddlefrequencyChat from '@/components/business/MiddlefrequencyChat.vue';
+import MiddlefrequencyChat from '@/components/business/MiddleFrequencyChat.vue';
 import FileToAudio from '@/components/FileReader/FileToAudio.vue';
 import { Mic, VideoPause, Check, Close } from '@element-plus/icons-vue';
 import moment from 'moment';

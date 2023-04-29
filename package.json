@@ -15,14 +15,12 @@
         "@element-plus/icons-vue": "^2.1.0",
         "element-plus": "^2.3.3",
         "fix-webm-duration": "^1.0.5",
-        "fix-webm-metainfo": "^1.0.8",
         "mediainfo.js": "^0.1.9",
         "moment": "^2.29.4",
         "normalize.css": "^8.0.1",
         "pinia": "^2.0.35",
         "vue": "^3.2.47",
-        "vue-router": "4",
-        "webm-to-wav-converter": "^1.1.0"
+        "vue-router": "4"
     },
     "devDependencies": {
         "@rushstack/eslint-patch": "^1.2.0",
